@@ -1,0 +1,27 @@
+variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    NMSPC: uat
+
+services:
+    - docker:19.03.14-dind
+
+stages:
+    - publish
+
+publish_job:
+    stage: publish
+    image: docker:latest
+    allow_failure: false
+    only:
+        - development
+    script:
+        - apk add --update make ca-certificates openssl build-base python3-dev python3 libffi-dev libressl-dev bash git gettext curl
+        - update-ca-certificates
+        - docker login --username magittitconsultancy --password $DOCKERHUB_SERVICE_KEY
+        - docker build -t $IMAGE_NAME .
+        - docker tag $IMAGE_NAME "$IMAGE_NAME"
+        - docker push "$IMAGE_NAME"
+    when: manual
+

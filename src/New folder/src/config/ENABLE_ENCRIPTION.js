@@ -1,0 +1,1 @@
+export const  ENABLE_ENCRIPTION=1
